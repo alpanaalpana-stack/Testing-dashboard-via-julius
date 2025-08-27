@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Sales Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f8f9fa;
+    }
+    header {
+      background: #4CAF50;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+    .cards {
+      display: flex;
+      justify-content: space-around;
+      margin: 1rem;
+    }
+    .card {
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      flex: 1;
+      margin: 0.5rem;
+      text-align: center;
+    }
+    canvas {
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      margin: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>📊 Simple Sales Dashboard</h1>
+</header>
+
+<section class="cards">
+  <div class="card">
+    <h2>$12,500</h2>
+    <p>Total Sales</p>
+  </div>
+  <div class="card">
+    <h2>320</h2>
+    <p>New Customers</p>
+  </div>
+  <div class="card">
+    <h2>$39</h2>
+    <p>Avg. Order Value</p>
+  </div>
+</section>
+
+<section>
+  <canvas id="salesChart"></canvas>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const ctx = document.getElementById('salesChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+      datasets: [{
+        label: 'Monthly Sales ($)',
+        data: [2000, 2500, 4000, 3500, 5000, 5500],
+        borderColor: '#4CAF50',
+        backgroundColor: 'rgba(76, 175, 80, 0.2)',
+        fill: true,
+        tension: 0.3
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          display: true,
+          labels: { color: '#333' }
+        }
+      },
+      scales: {
+        x: { ticks: { color: '#333' } },
+        y: { ticks: { color: '#333' } }
+      }
+    }
+  });
+</script>
+
+</body>
+</html>
