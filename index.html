@@ -44,7 +44,7 @@ Hello World
 
   <!-- Revenue vs Ad Spend Chart (Chart.js) -->
   <div id="rev-vs-spend" style="margin:16px 0;">
-    <canvas id="revSpendChart" height="180"></canvas>
+    <canvas id="revSpendChart" width="800" height="360" style="width:800px; height:360px;"></canvas>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
@@ -67,7 +67,8 @@ Hello World
           ]
         },
         options: {
-          responsive: true,
+          responsive: false,
+          maintainAspectRatio: false,
           interaction: { mode: 'index', intersect: false },
           plugins: { legend: { position: 'top' }, title: { display: true, text: 'Monthly Revenue vs Ad Spend (with ROAS)' } },
           scales: {
