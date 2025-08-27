@@ -1,3 +1,4 @@
+Hello World
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -60,40 +61,39 @@
   </div>
 </section>
 
-<section>
-  <canvas id="salesChart"></canvas>
-</section>
+<canvas id="salesChart" width="400" height="200"></canvas>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  const ctx = document.getElementById('salesChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-      datasets: [{
-        label: 'Monthly Sales ($)',
-        data: [2000, 2500, 4000, 3500, 5000, 5500],
-        borderColor: '#4CAF50',
-        backgroundColor: 'rgba(76, 175, 80, 0.2)',
-        fill: true,
-        tension: 0.3
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          display: true,
-          labels: { color: '#333' }
-        }
-      },
-      scales: {
-        x: { ticks: { color: '#333' } },
-        y: { ticks: { color: '#333' } }
-      }
-    }
+  // Simple chart using Canvas API (no external libs)
+  const canvas = document.getElementById('salesChart');
+  const ctx = canvas.getContext('2d');
+  const data = [5, 9, 7, 14, 10, 12, 15, 9, 11, 13, 16, 18];
+
+  const width = canvas.width;
+  const height = canvas.height;
+  const padding = 30;
+  const stepX = (width - padding * 2) / (data.length - 1);
+  const maxVal = Math.max.apply(null, data);
+
+  ctx.clearRect(0, 0, width, height);
+  ctx.strokeStyle = '#ddd';
+  for (let i = 0; i <= 5; i++) {
+    const y = padding + (height - padding * 2) * i / 5;
+    ctx.beginPath();
+    ctx.moveTo(padding, y);
+    ctx.lineTo(width - padding, y);
+    ctx.stroke();
+  }
+
+  ctx.strokeStyle = '#4CAF50';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  data.forEach((val, i) => {
+    const x = padding + i * stepX;
+    const y = height - padding - (val / maxVal) * (height - padding * 2);
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
   });
+  ctx.stroke();
 </script>
 
 </body>
