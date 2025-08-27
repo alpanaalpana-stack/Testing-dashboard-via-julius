@@ -5,38 +5,39 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Simple Sales Dashboard</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      background: #f8f9fa;
+    :root{
+      --bg:#f6f8fb; --card:#ffffff; --text:#1f2937; --muted:#6b7280; --brand:#4CAF50; --brand-2:#2196F3; --accent:#FF9800;
+      --maxw:1100px;
     }
-    header {
-      background: #4CAF50;
-      color: white;
-      padding: 1rem;
-      text-align: center;
-    }
-    .cards {
-      display: flex;
-      justify-content: space-around;
-      margin: 1rem;
-    }
-    .card {
-      background: white;
-      padding: 1rem;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      flex: 1;
-      margin: 0.5rem;
-      text-align: center;
-    }
-    canvas {
-      background: white;
-      padding: 1rem;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      margin: 1rem auto;
-      display: block;
+    body { font-family: Arial, sans-serif; margin: 0; background: var(--bg); color: var(--text); }
+    header { background: var(--brand); color: white; padding: 1rem; text-align: center; }
+
+    /* New container + card layout */
+    .container { max-width: var(--maxw); margin: 0 auto; padding: 16px; }
+    .card { background: var(--card); border-radius: 12px; box-shadow: 0 6px 18px rgba(0,0,0,0.06); padding: 16px; margin: 16px 0; }
+    .card h3 { margin: 0 0 8px 0; font-size: 18px; }
+
+    /* KPI row */
+    .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .kpi { background: var(--card); border-radius: 12px; box-shadow: 0 4px 14px rgba(0,0,0,0.05); padding: 14px 16px; }
+    .kpi .label{ color: var(--muted); font-size: 13px; }
+    .kpi .value{ font-size: 24px; font-weight: 700; margin-top: 2px; }
+    .kpi .delta{ font-size: 12px; margin-top: 6px; }
+    .delta.up{ color:#16a34a; }
+    .delta.down{ color:#dc2626; }
+
+    /* Chips */
+    .chips{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:8px; }
+    .chip{ background:#eef2ff; color:#3730a3; border-radius:999px; padding:6px 10px; font-size:12px; }
+
+    /* Canvas styling inside cards */
+    canvas { background: white; padding: 10px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); display:block; margin: 0 auto; }
+
+    /* Responsive tweak: scale charts on small screens */
+    @media (max-width: 740px){
+      .kpis{ grid-template-columns: 1fr; }
+      #revSpendChart{ width:100% !important; height:240px !important; }
+      #salesChart{ width:100% !important; height:220px !important; }
     }
   </style>
 </head>
@@ -46,91 +47,157 @@
   <h1>📊 Simple Sales Dashboard</h1>
 </header>
 
-  <!-- Revenue vs Ad Spend Chart (Chart.js) -->
-  <div id="rev-vs-spend" style="margin:16px 0;">
+<div class="container">
+
+  <!-- KPI cards with deltas -->
+  <section class="kpis">
+    <div class="kpi">
+      <div class="label">Total Sales</div>
+      <div class="value">$12,500</div>
+      <div class="delta up">▲ 5.4% vs last month</div>
+    </div>
+    <div class="kpi">
+      <div class="label">New Customers</div>
+      <div class="value">320</div>
+      <div class="delta down">▼ 2.1% vs last month</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Avg. Order Value</div>
+      <div class="value">$39</div>
+      <div class="delta up">▲ 1.8% vs last month</div>
+    </div>
+  </section>
+
+  <!-- Revenue vs Ad Spend Card -->
+  <section class="card">
+    <h3>Revenue vs Ad Spend</h3>
+    <div class="chips" id="roasChips"></div>
     <canvas id="revSpendChart" width="800" height="360" style="width:800px; height:360px;"></canvas>
-  </div>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script>
-    (function(){
-      var ctx = document.getElementById('revSpendChart').getContext('2d');
-      var labels = [
-        '2024-01','2024-02','2024-03','2024-04','2024-05','2024-06','2024-07','2024-08','2024-09','2024-10','2024-11','2024-12'
-      ];
-      var revenue = [665998,700000,716034,589553,550475,607207,690845,714931,688557,666799,644472,615053];
-      var adSpend = [204255,212219,194696,172166,167592,175430,190217,201088,199443,205118,208774,210335];
-      var roas = revenue.map(function(v,i){ return v / adSpend[i]; });
+  </section>
 
-      var chart = new Chart(ctx, {
-        data: {
-          labels: labels,
-          datasets: [
-            { type: 'bar', label: 'Revenue', data: revenue, backgroundColor: '#4CAF50', yAxisID: 'y' },
-            { type: 'bar', label: 'Ad Spend', data: adSpend, backgroundColor: '#2196F3', yAxisID: 'y' },
-            { type: 'line', label: 'ROAS', data: roas, borderColor: '#FF9800', backgroundColor: 'rgba(255,152,0,0.2)', yAxisID: 'y1' }
-          ]
-        },
-        options: {
-          responsive: false,
-          maintainAspectRatio: false,
-          interaction: { mode: 'index', intersect: false },
-          plugins: { legend: { position: 'top' }, title: { display: true, text: 'Monthly Revenue vs Ad Spend (with ROAS)' } },
-          scales: {
-            y: { title: { display: true, text: 'Amount' }, beginAtZero: false },
-            y1: { position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'ROAS' } }
-          }
-        }
-      });
-    })();
-  </script>
+  <!-- KPI cards already existed above; keeping existing sales card improved -->
+  <section class="card">
+    <h3>Sales</h3>
+    <canvas id="salesChart" width="640" height="260" style="width:640px; height:260px;"></canvas>
+  </section>
 
-<section class="cards">
-  <div class="card">
-    <h2>$12,500</h2>
-    <p>Total Sales</p>
-  </div>
-  <div class="card">
-    <h2>320</h2>
-    <p>New Customers</p>
-  </div>
-  <div class="card">
-    <h2>$39</h2>
-    <p>Avg. Order Value</p>
-  </div>
-</section>
+</div>
 
-<!-- Improved Sales chart (smaller, proper labels) -->
-<canvas id="salesChart" width="640" height="260" style="width:640px; height:260px;"></canvas>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  var ctx2 = document.getElementById('salesChart').getContext('2d');
-  var chart2 = new Chart(ctx2, {
-    type: 'line',
-    data: {
-      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-      datasets: [{
-        label: 'Monthly Sales ($)',
-        backgroundColor: 'rgba(54, 162, 235, 0.15)',
-        borderColor: 'rgb(54, 162, 235)',
-        pointBackgroundColor: 'rgb(54, 162, 235)',
-        pointRadius: 3,
-        tension: 0.25,
-        data: [1200, 1900, 3000, 2500, 2200, 2800, 3200, 3100, 2900, 3300, 3400, 3600]
-      }]
-    },
-    options: {
-      responsive: false,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: true, position: 'top' },
-        title: { display: true, text: 'Monthly Sales Trend' }
+  // Helper: currency formatter
+  function fmtUsd(n){
+    try { return new Intl.NumberFormat('en-US', { style:'currency', currency:'USD', maximumFractionDigits:0 }).format(n); }
+    catch(e){ return n; }
+  }
+
+  // Revenue vs Ad Spend chart with formatted tooltips and nicer styling
+  (function(){
+    var ctx = document.getElementById('revSpendChart').getContext('2d');
+    var labels = ['2024-01','2024-02','2024-03','2024-04','2024-05','2024-06','2024-07','2024-08','2024-09','2024-10','2024-11','2024-12'];
+    var revenue = [665998,700000,716034,589553,550475,607207,690845,714931,688557,666799,644472,615053];
+    var adSpend = [204255,212219,194696,172166,167592,175430,190217,201088,199443,205118,208774,210335];
+    var roas = revenue.map(function(v,i){ return v / adSpend[i]; });
+
+    // ROAS chips
+    var latestRoas = roas[roas.length-1];
+    var avgRoas = roas.reduce(function(a,b){return a+b;},0) / roas.length;
+    var bestIdx = roas.indexOf(Math.max.apply(null, roas));
+    var chips = document.getElementById('roasChips');
+    chips.innerHTML = '' +
+      '<span class=chip>Latest ROAS: ' + latestRoas.toFixed(2) + '</span>' +
+      '<span class=chip>Avg ROAS YTD: ' + avgRoas.toFixed(2) + '</span>' +
+      '<span class=chip>Best Month: ' + labels[bestIdx] + ' (' + roas[bestIdx].toFixed(2) + ')</span>';
+
+    new Chart(ctx, {
+      data: {
+        labels: labels,
+        datasets: [
+          { type: 'bar', label: 'Revenue', data: revenue, backgroundColor: 'rgba(76,175,80,0.85)', borderRadius: 6, yAxisID: 'y' },
+          { type: 'bar', label: 'Ad Spend', data: adSpend, backgroundColor: 'rgba(33,150,243,0.85)', borderRadius: 6, yAxisID: 'y' },
+          { type: 'line', label: 'ROAS', data: roas, borderColor: '#FF9800', backgroundColor: 'rgba(255,152,0,0.15)', tension: 0.25, yAxisID: 'y1' }
+        ]
       },
-      scales: {
-        x: { title: { display: true, text: 'Month' } },
-        y: { title: { display: true, text: 'Sales ($)' }, beginAtZero: true }
+      options: {
+        responsive: false,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { position: 'top' },
+          title: { display: true, text: 'Monthly Revenue vs Ad Spend (with ROAS)' },
+          tooltip: {
+            callbacks: {
+              label: function(ctx){
+                var l = ctx.dataset.label || '';
+                var v = ctx.parsed.y;
+                if (ctx.dataset.yAxisID === 'y1') { return l + ': ' + v.toFixed(2); }
+                return l + ': ' + fmtUsd(v);
+              }
+            }
+          }
+        },
+        scales: {
+          y: { title: { display: true, text: 'Amount (USD)' }, beginAtZero: false, grid: { color: 'rgba(0,0,0,0.05)' } },
+          y1: { position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'ROAS' } },
+          x: { grid: { color: 'rgba(0,0,0,0.03)' } }
+        }
       }
+    });
+  })();
+
+  // Sales chart with 3-month moving average and target line
+  (function(){
+    var ctx2 = document.getElementById('salesChart').getContext('2d');
+    var labels2 = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var sales = [1200, 1900, 3000, 2500, 2200, 2800, 3200, 3100, 2900, 3300, 3400, 3600];
+
+    // 3-month moving average
+    function movAvg(arr, w){
+      var out = [];
+      for (var i=0;i<arr.length;i++){
+        var s = 0; var c = 0;
+        for (var k=0;k<w;k++){
+          var j = i-k;
+          if (j >= 0){ s += arr[j]; c += 1; }
+        }
+        out.push(c ? s / c : null);
+      }
+      return out;
     }
-  });
+    var ma3 = movAvg(sales, 3);
+
+    // Target line (flat goal)
+    var target = new Array(sales.length).fill(3500);
+
+    new Chart(ctx2, {
+      type: 'line',
+      data: {
+        labels: labels2,
+        datasets: [
+          { label: 'Monthly Sales ($)', data: sales, backgroundColor: 'rgba(54, 162, 235, 0.15)', borderColor: 'rgb(54, 162, 235)', pointBackgroundColor: 'rgb(54, 162, 235)', pointRadius: 3, tension: 0.25 },
+          { label: '3-mo Moving Avg', data: ma3, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.12)', pointRadius: 0, tension: 0.2 },
+          { label: 'Target', data: target, borderColor: '#ef4444', pointRadius: 0, borderDash: [6,6] }
+        ]
+      },
+      options: {
+        responsive: false,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'top' },
+          title: { display: true, text: 'Monthly Sales Trend' },
+          tooltip: {
+            callbacks: {
+              label: function(ctx){ return ctx.dataset.label + ': ' + fmtUsd(ctx.parsed.y); }
+            }
+          }
+        },
+        scales: {
+          x: { title: { display: true, text: 'Month' } },
+          y: { title: { display: true, text: 'Sales ($)' }, beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } }
+        }
+      }
+    });
+  })();
 </script>
 
 </body>
