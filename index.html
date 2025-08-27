@@ -42,6 +42,43 @@ Hello World
 </head>
 <body>
 
+  <!-- Revenue vs Ad Spend Chart (Chart.js) -->
+  <div id="rev-vs-spend" style="margin:16px 0;">
+    <canvas id="revSpendChart" height="180"></canvas>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    (function(){
+      var ctx = document.getElementById('revSpendChart').getContext('2d');
+      var labels = [
+        '2024-01','2024-02','2024-03','2024-04','2024-05','2024-06','2024-07','2024-08','2024-09','2024-10','2024-11','2024-12'
+      ];
+      var revenue = [665998,700000,716034,589553,550475,607207,690845,714931,688557,666799,644472,615053];
+      var adSpend = [204255,212219,194696,172166,167592,175430,190217,201088,199443,205118,208774,210335];
+      var roas = revenue.map(function(v,i){ return v / adSpend[i]; });
+
+      var chart = new Chart(ctx, {
+        data: {
+          labels: labels,
+          datasets: [
+            { type: 'bar', label: 'Revenue', data: revenue, backgroundColor: '#4CAF50', yAxisID: 'y' },
+            { type: 'bar', label: 'Ad Spend', data: adSpend, backgroundColor: '#2196F3', yAxisID: 'y' },
+            { type: 'line', label: 'ROAS', data: roas, borderColor: '#FF9800', backgroundColor: 'rgba(255,152,0,0.2)', yAxisID: 'y1' }
+          ]
+        },
+        options: {
+          responsive: true,
+          interaction: { mode: 'index', intersect: false },
+          plugins: { legend: { position: 'top' }, title: { display: true, text: 'Monthly Revenue vs Ad Spend (with ROAS)' } },
+          scales: {
+            y: { title: { display: true, text: 'Amount' }, beginAtZero: false },
+            y1: { position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'ROAS' } }
+          }
+        }
+      });
+    })();
+  </script>
+
 <header>
   <h1>📊 Simple Sales Dashboard</h1>
 </header>
@@ -64,36 +101,19 @@ Hello World
 <canvas id="salesChart" width="400" height="200"></canvas>
 
 <script>
-  // Simple chart using Canvas API (no external libs)
-  const canvas = document.getElementById('salesChart');
-  const ctx = canvas.getContext('2d');
-  const data = [5, 9, 7, 14, 10, 12, 15, 9, 11, 13, 16, 18];
-
-  const width = canvas.width;
-  const height = canvas.height;
-  const padding = 30;
-  const stepX = (width - padding * 2) / (data.length - 1);
-  const maxVal = Math.max.apply(null, data);
-
-  ctx.clearRect(0, 0, width, height);
-  ctx.strokeStyle = '#ddd';
-  for (let i = 0; i <= 5; i++) {
-    const y = padding + (height - padding * 2) * i / 5;
-    ctx.beginPath();
-    ctx.moveTo(padding, y);
-    ctx.lineTo(width - padding, y);
-    ctx.stroke();
-  }
-
-  ctx.strokeStyle = '#4CAF50';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  data.forEach((val, i) => {
-    const x = padding + i * stepX;
-    const y = height - padding - (val / maxVal) * (height - padding * 2);
-    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  var ctx2 = document.getElementById('salesChart').getContext('2d');
+  var chart2 = new Chart(ctx2, {
+    type: 'line',
+    data: {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      datasets: [{
+        label: 'Sales',
+        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        borderColor: 'rgb(54, 162, 235)',
+        data: [1200, 1900, 3000, 2500, 2200, 2800, 3200, 3100, 2900, 3300, 3400, 3600]
+      }]
+    }
   });
-  ctx.stroke();
 </script>
 
 </body>
