@@ -35,7 +35,8 @@
       padding: 1rem;
       border-radius: 8px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      margin: 1rem;
+      margin: 1rem auto;
+      display: block;
     }
   </style>
 </head>
@@ -98,7 +99,8 @@
   </div>
 </section>
 
-<canvas id="salesChart" width="400" height="200"></canvas>
+<!-- Improved Sales chart (smaller, proper labels) -->
+<canvas id="salesChart" width="640" height="260" style="width:640px; height:260px;"></canvas>
 
 <script>
   var ctx2 = document.getElementById('salesChart').getContext('2d');
@@ -107,11 +109,26 @@
     data: {
       labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
       datasets: [{
-        label: 'Sales',
-        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        label: 'Monthly Sales ($)',
+        backgroundColor: 'rgba(54, 162, 235, 0.15)',
         borderColor: 'rgb(54, 162, 235)',
+        pointBackgroundColor: 'rgb(54, 162, 235)',
+        pointRadius: 3,
+        tension: 0.25,
         data: [1200, 1900, 3000, 2500, 2200, 2800, 3200, 3100, 2900, 3300, 3400, 3600]
       }]
+    },
+    options: {
+      responsive: false,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true, position: 'top' },
+        title: { display: true, text: 'Monthly Sales Trend' }
+      },
+      scales: {
+        x: { title: { display: true, text: 'Month' } },
+        y: { title: { display: true, text: 'Sales ($)' }, beginAtZero: true }
+      }
     }
   });
 </script>
